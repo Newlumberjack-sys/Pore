@@ -51,7 +51,7 @@ public class PoreCommandCallable extends PoreWrapper<Command> implements Command
     @Override
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
         // TODO: Label
-        if (getHandle().execute(PoreCommandSender.of(source), getHandle().getLabel(),
+        if (getHandle().execute(PoreCommandSender.of(source), getHandle().getName(),
                 StringUtils.split(arguments))) {
             return CommandResult.success();
         } else {
@@ -62,7 +62,7 @@ public class PoreCommandCallable extends PoreWrapper<Command> implements Command
     @Override
     public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
         // TODO: Label
-        return getHandle().tabComplete(PoreCommandSender.of(source), getHandle().getLabel(),
+        return getHandle().tabComplete(PoreCommandSender.of(source), getHandle().getName(),
                 StringUtils.split(arguments));
     }
 
