@@ -30,6 +30,8 @@ import blue.lapis.pore.converter.wrapper.WrapperConverter;
 import blue.lapis.pore.impl.command.PoreCommandMap;
 import blue.lapis.pore.impl.command.PoreConsoleCommandSender;
 import blue.lapis.pore.impl.entity.PorePlayer;
+import blue.lapis.pore.impl.PoreOfflinePlayer;
+import blue.lapis.pore.converter.type.world.GeneratorTypeConverter;
 import blue.lapis.pore.impl.help.PoreHelpMap;
 import blue.lapis.pore.impl.scheduler.PoreBukkitScheduler;
 import blue.lapis.pore.impl.util.PoreCachedServerIcon;
@@ -40,6 +42,7 @@ import blue.lapis.pore.util.PoreWrapper;
 import com.avaje.ebean.config.ServerConfig;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.NotImplementedException;
 import org.bukkit.BanList;
@@ -88,9 +91,12 @@ import org.bukkit.util.permissions.DefaultPermissions;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.ban.Ban;
+import org.spongepowered.api.world.DimensionTypes;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -270,32 +276,38 @@ public class PoreServer extends PoreWrapper<org.spongepowered.api.Server> implem
 
     @Override
     public String getServerName() {
-        throw new NotImplementedException("TODO");
+        return game.getPlatform().getImplementation().getName();
     }
 
     @Override
     public String getServerId() {
-        throw new NotImplementedException("TODO");
+        return game.getPlatform().getImplementation().getId();
     }
 
     @Override
     public String getWorldType() {
-        throw new NotImplementedException("TODO");
+        return getHandle().getDefaultWorld()
+                .map(p -> GeneratorTypeConverter.of(p.getGeneratorType()).getName())
+                .orElse("DEFAULT");
     }
 
     @Override
     public boolean getGenerateStructures() {
-        throw new NotImplementedException("TODO");
+        return getHandle().getDefaultWorld()
+                .map(WorldProperties::usesMapFeatures)
+                .orElse(false);
     }
 
     @Override
     public boolean getAllowEnd() {
-        throw new NotImplementedException("TODO");
+        return getHandle().getAllWorldProperties().stream()
+                .anyMatch(p -> p.getDimensionType() == DimensionTypes.THE_END);
     }
 
     @Override
     public boolean getAllowNether() {
-        throw new NotImplementedException("TODO");
+        return getHandle().getAllWorldProperties().stream()
+                .anyMatch(p -> p.getDimensionType() == DimensionTypes.NETHER);
     }
 
     @Override
@@ -310,12 +322,22 @@ public class PoreServer extends PoreWrapper<org.spongepowered.api.Server> implem
 
     @Override
     public Set<OfflinePlayer> getWhitelistedPlayers() {
-        throw new NotImplementedException("TODO");
+        Optional<WhitelistService> ws = game.getServiceManager().provide(WhitelistService.class);
+        if (!ws.isPresent()) {
+            return ImmutableSet.of();
+        }
+        UserStorageService uss = game.getServiceManager().provideUnchecked(UserStorageService.class);
+        return ws.get().getWhitelistedProfiles().stream()
+                .map(uss::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(PoreOfflinePlayer::of)
+                .collect(GuavaCollectors.toImmutableSet());
     }
 
     @Override
     public void reloadWhitelist() {
-        throw new NotImplementedException("TODO");
+        // Sponge automatically persists whitelist changes, nothing to reload
     }
 
     @Override
