@@ -45,8 +45,7 @@ public class PoreScoreboardManager extends PoreWrapper<Scoreboard.Builder>
 
     @Override
     public org.bukkit.scoreboard.Scoreboard getMainScoreboard() {
-        //TODO: scoreboard are per-world
-        throw new NotImplementedException("TODO");
+        return PoreScoreboard.of(Scoreboard.builder().build());
     }
 
     @Override

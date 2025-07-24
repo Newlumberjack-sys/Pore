@@ -187,7 +187,10 @@ public class PoreScoreboard extends PoreWrapper<Scoreboard> implements org.bukki
 
     @Override
     public Set<String> getEntries() {
-        throw new NotImplementedException("TODO");
+        return Sets.newHashSet(Collections2.transform(
+                getHandle().getEntries(),
+                PoreText::convert
+        ));
     }
 
     @Override

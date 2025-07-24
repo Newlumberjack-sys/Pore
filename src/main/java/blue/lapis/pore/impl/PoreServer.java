@@ -80,6 +80,8 @@ import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.plugin.messaging.StandardMessenger;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.ScoreboardManager;
+import blue.lapis.pore.impl.scoreboard.PoreScoreboardManager;
+import org.spongepowered.api.scoreboard.Scoreboard;
 import org.bukkit.util.CachedServerIcon;
 import org.bukkit.util.StringUtil;
 import org.bukkit.util.permissions.DefaultPermissions;
@@ -754,7 +756,7 @@ public class PoreServer extends PoreWrapper<org.spongepowered.api.Server> implem
 
     @Override
     public ScoreboardManager getScoreboardManager() {
-        throw new NotImplementedException("TODO");
+        return new PoreScoreboardManager(Scoreboard.builder());
     }
 
     @Override
